@@ -1,5 +1,9 @@
 build/
 
+# Nix build results
+result
+result-*
+
 .*.cmd
 .*.swp
 *.ko
