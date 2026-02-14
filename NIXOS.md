@@ -102,18 +102,30 @@ If you prefer to install the driver manually:
 
 ### Method 3: Overlay in NixOS Configuration
 
-You can also add the driver as an overlay:
+You can also add the driver as an overlay in your flake-based configuration:
 
 ```nix
 {
-  nixpkgs.overlays = [
-    (final: prev: {
-      axelera-driver = (builtins.getFlake "github:danhab99/axelera-driver").packages.${prev.system}.metis-driver;
-    })
-  ];
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    axelera-driver.url = "github:danhab99/axelera-driver";
+  };
 
-  boot.extraModulePackages = [ pkgs.axelera-driver ];
-  boot.kernelModules = [ "metis" ];
+  outputs = { self, nixpkgs, axelera-driver }: {
+    nixosConfigurations.yourHost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [{
+        nixpkgs.overlays = [
+          (final: prev: {
+            axelera-driver = axelera-driver.packages.${prev.system}.metis-driver;
+          })
+        ];
+
+        boot.extraModulePackages = [ pkgs.axelera-driver ];
+        boot.kernelModules = [ "metis" ];
+      }];
+    };
+  };
 }
 ```
 
@@ -136,19 +148,32 @@ make clean
 
 ### Building for a Specific Kernel
 
-The flake builds against the default kernel in nixpkgs. To build for a specific kernel version, you can override the kernel:
+The flake builds against the default kernel in nixpkgs. To build for a specific kernel version, you can override it in your NixOS configuration:
 
 ```nix
 {
-  packages.x86_64-linux.metis-driver-custom = 
-    let
-      pkgs = import nixpkgs { system = "x86_64-linux"; };
-    in
-    pkgs.callPackage ./flake.nix {
-      kernel = pkgs.linuxPackages_6_6.kernel;
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    axelera-driver.url = "github:danhab99/axelera-driver";
+  };
+
+  outputs = { self, nixpkgs, axelera-driver }: {
+    nixosConfigurations.yourHost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        axelera-driver.nixosModules.default
+        {
+          # Use a specific kernel version
+          boot.kernelPackages = pkgs.linuxPackages_6_6;
+          hardware.axelera.enable = true;
+        }
+      ];
     };
+  };
 }
 ```
+
+The NixOS module will automatically build the driver against the configured kernel.
 
 ## Troubleshooting
 
