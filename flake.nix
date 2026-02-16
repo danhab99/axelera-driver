@@ -15,16 +15,16 @@
         pname = "metis-driver";
         version = "1.5.3";
 
-        src = self;
+        src = ./.;
 
         nativeBuildInputs = with pkgs; [
           kmod
           gnumake
-        ] ++ kernel.moduleBuildDependencies;
+        ];
 
         hardeningDisable = [ "pic" "format" ];
 
-        makeFlags = kernel.makeFlags ++ [
+        makeFlags = [
           "KDIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
         ];
 
@@ -40,8 +40,6 @@
           cp metis.ko $out/lib/modules/${kernel.modDirVersion}/extra/
           runHook postInstall
         '';
-
-        enableParallelBuilding = true;
 
         meta = with pkgs.lib; {
           description = "Linux kernel module for Axelera AI PCIe devices";
