@@ -7,6 +7,7 @@ Linux kernel module for Axelera AI devices.
 **Supported Operating Systems:**
 - Ubuntu 22.04 LTS
 - Ubuntu 24.04 LTS
+- NixOS (see [NIXOS.md](NIXOS.md) for Nix flake instructions)
 
 **Requirements:**
 - Linux kernel headers for your target kernel version
@@ -42,6 +43,8 @@ Where `KDIR` points to the configured kernel source tree or build output directo
 
 ## Installation
 
+### Traditional Installation (Ubuntu/Debian)
+
 To install the built module to the system:
 
 ```bash
@@ -54,6 +57,27 @@ To load the module:
 
 ```bash
 sudo modprobe metis
+```
+
+### NixOS Installation
+
+For NixOS users, this driver is available as a Nix flake with a convenient NixOS module. See [NIXOS.md](NIXOS.md) for detailed installation instructions.
+
+Quick start for NixOS:
+
+```nix
+{
+  inputs.axelera-driver.url = "github:danhab99/axelera-driver";
+  
+  outputs = { axelera-driver, ... }: {
+    nixosConfigurations.yourHost = {
+      modules = [
+        axelera-driver.nixosModules.default
+        { hardware.axelera.enable = true; }
+      ];
+    };
+  };
+}
 ```
 
 ## Module Details
