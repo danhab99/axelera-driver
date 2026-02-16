@@ -27,6 +27,14 @@ nix build github:danhab99/axelera-driver
 
 The built kernel module will be available in `./result/lib/modules/<kernel-version>/extra/metis.ko`.
 
+To build just the kernel module binary:
+
+```bash
+nix build github:danhab99/axelera-driver#metis-ko
+```
+
+This will produce `./result/metis.ko` which can be loaded directly with `insmod` (though using the NixOS module is recommended).
+
 ### Building for Your Local Kernel
 
 If you're developing locally:
@@ -216,7 +224,8 @@ nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 The flake provides:
 
-- **packages.default** / **packages.metis-driver**: The compiled kernel module
+- **packages.default** / **packages.metis-driver**: The compiled kernel module package
+- **packages.metis-ko**: Just the kernel module binary file (metis.ko)
 - **nixosModules.default**: A NixOS module for system integration
 
 ### Package Metadata
